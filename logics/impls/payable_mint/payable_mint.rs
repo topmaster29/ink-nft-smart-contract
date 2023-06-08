@@ -106,6 +106,28 @@ where
         return Ok(())
     }
 
+    /// Mint next available token with given metadata uri
+    default fn mint_with_metadatauri(&mut self, metadata_uri:PreludeString)->Result<(), PSP34Error>{
+        self.check_value(Self::env().transferred_value(), 1)?;
+        let caller = Self::env().caller();
+        let token_id =
+            self.data::<Data>()
+                .last_token_id
+                .checked_add(1)
+                .ok_or(PSP34Error::Custom(String::from(
+                    Shiden34Error::CollectionIsFull.as_str(),
+                )))?;
+        self.data::<psp34::Data<enumerable::Balances>>()
+            ._mint_to(caller, Id::U64(token_id))?;
+
+        self.data::<Data>().metadatas.insert(token_id, &metadata_uri);
+        
+        self.data::<Data>().last_token_id += 1;
+
+        self._emit_transfer_event(None, Some(caller), Id::U64(token_id));
+        return Ok(())
+    }
+
     /// Set new value for the baseUri
     #[modifiers(only_owner)]
     default fn set_base_uri(&mut self, uri: PreludeString) -> Result<(), PSP34Error> {
@@ -149,7 +171,8 @@ where
             String::from("baseUri"),
         );
         let mut token_uri = PreludeString::from_utf8(value.unwrap()).unwrap();
-        token_uri = token_uri + &token_id.to_string() + &PreludeString::from(".json");
+        let metadata_uri=self.data::<Data>().metadatas.get(token_id);
+        token_uri = token_uri + metadata_uri.as_deref().unwrap_or("");
         Ok(token_uri)
     }
 

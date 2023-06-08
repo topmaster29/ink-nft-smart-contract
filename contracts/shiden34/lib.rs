@@ -22,6 +22,8 @@ pub mod shiden34 {
         },
     };
 
+    use ink::storage::Mapping;
+
     use payable_mint_pkg::{
         impls::payable_mint::*,
         traits::payable_mint::*,
@@ -90,6 +92,7 @@ pub mod shiden34 {
             instance.payable_mint.price_per_mint = price_per_mint;
             instance.payable_mint.last_token_id = 0;
             instance.payable_mint.max_amount = 1;
+            instance.payable_mint.metadatas=Mapping::default();
             instance
         }
     }
@@ -298,7 +301,7 @@ pub mod shiden34 {
             assert_eq!(sh34.token_uri(42), Err(TokenNotExists));
             assert_eq!(
                 sh34.token_uri(1),
-                Ok(PreludeString::from(BASE_URI.to_owned() + "1.json"))
+                Ok(PreludeString::from(BASE_URI.to_owned()))
             );
 
             // return error if request is for not yet minted token
@@ -309,8 +312,11 @@ pub mod shiden34 {
             assert!(sh34.set_base_uri(PreludeString::from("")).is_ok());
             assert_eq!(
                 sh34.token_uri(1),
-                Ok("".to_owned() + &PreludeString::from("1.json"))
+                Ok("".to_owned())
             );
+
+            assert!(sh34.mint_with_metadatauri(PreludeString::from("uri")).is_ok());
+            assert_eq!(sh34.token_uri(2), Ok("".to_owned()+&PreludeString::from("uri")));
         }
 
         #[ink::test]

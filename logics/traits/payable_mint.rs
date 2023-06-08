@@ -21,6 +21,9 @@ pub trait PayableMint {
     #[ink(message, payable)]
     fn mint_next(&mut self) -> Result<(), PSP34Error>;
 
+    #[ink(message, payable)]
+    fn mint_with_metadatauri(&mut self, metadata_uri: PreludeString) -> Result<(), PSP34Error>;
+
     /// Set new value for the baseUri
     #[ink(message)]
     fn set_base_uri(&mut self, uri: PreludeString) -> Result<(), PSP34Error>;

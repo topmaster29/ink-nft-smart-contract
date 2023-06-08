@@ -2,6 +2,12 @@ use openbrush::traits::{
     Balance,
     String,
 };
+
+use ink::prelude::string::{
+    String as PreludeString,
+};
+
+use ink::storage::Mapping;
 pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);
 
 #[derive(Default, Debug)]
@@ -12,6 +18,7 @@ pub struct Data {
     pub max_supply: u64,
     pub price_per_mint: Balance,
     pub max_amount: u64,
+    pub metadatas: Mapping<u64, PreludeString>
 }
 
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
