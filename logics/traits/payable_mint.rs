@@ -9,10 +9,10 @@ use openbrush::{
 };
 
 #[openbrush::wrapper]
-pub type PayableMintRef = dyn PayableMint;
+pub type PayableMintRef = dyn Psp34Traits;
 
 #[openbrush::trait_definition]
-pub trait PayableMint {
+pub trait Psp34Traits {
     /// Mint one or more tokens
     #[ink(message, payable)]
     fn mint(&mut self, to: AccountId, mint_amount: u64) -> Result<(), PSP34Error>;
@@ -38,7 +38,7 @@ pub trait PayableMint {
 
     /// Get URI from token ID
     #[ink(message)]
-    fn token_uri(&self, token_id: u64) -> Result<PreludeString, PSP34Error>;
+    fn token_uri(&self, token_id: u64) -> PreludeString;
 
     /// Get max supply of tokens
     #[ink(message)]

@@ -20,15 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use ink::prelude::string::{
-    String as PreludeString,
-    ToString,
+    String as PreludeString
 };
 
 use crate::impls::payable_mint::types::{
     Data,
     Shiden34Error,
 };
-pub use crate::traits::payable_mint::PayableMint;
+pub use crate::traits::payable_mint::Psp34Traits;
 use openbrush::{
     contracts::{
         ownable::*,
@@ -58,7 +57,7 @@ pub trait Internal {
     fn token_exists(&self, id: Id) -> Result<(), PSP34Error>;
 }
 
-impl<T> PayableMint for T
+impl<T> Psp34Traits for T
 where
     T: Storage<Data>
         + Storage<psp34::Data<enumerable::Balances>>
@@ -163,8 +162,8 @@ where
     }
 
     /// Get URI from token ID
-    default fn token_uri(&self, token_id: u64) -> Result<PreludeString, PSP34Error> {
-        self.token_exists(Id::U64(token_id))?;
+    default fn token_uri(&self, token_id: u64) -> PreludeString{
+        // self.token_exists(Id::U64(token_id))?;
         let value = self.get_attribute(
             self.data::<psp34::Data<enumerable::Balances>>()
                 .collection_id(),
@@ -173,7 +172,8 @@ where
         let mut token_uri = PreludeString::from_utf8(value.unwrap()).unwrap();
         let metadata_uri=self.data::<Data>().metadatas.get(token_id);
         token_uri = token_uri + metadata_uri.as_deref().unwrap_or("");
-        Ok(token_uri)
+        // Ok(token_uri)
+        token_uri
     }
 
     /// Get max supply of tokens

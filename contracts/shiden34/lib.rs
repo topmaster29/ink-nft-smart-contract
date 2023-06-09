@@ -119,7 +119,7 @@ pub mod shiden34 {
         }
     }
 
-    impl PayableMint for Shiden34Contract {}
+    impl Psp34Traits for Shiden34Contract {}
 
     // ------------------- T E S T -----------------------------------------------------
     #[cfg(test)]
@@ -298,25 +298,25 @@ pub mod shiden34 {
             test::set_value_transferred::<ink::env::DefaultEnvironment>(PRICE);
             assert!(sh34.mint_next().is_ok());
             // return error if request is for not yet minted token
-            assert_eq!(sh34.token_uri(42), Err(TokenNotExists));
+            assert_eq!(sh34.token_uri(42), PreludeString::from(BASE_URI.to_owned()));
             assert_eq!(
                 sh34.token_uri(1),
-                Ok(PreludeString::from(BASE_URI.to_owned()))
+                PreludeString::from(BASE_URI.to_owned())
             );
 
             // return error if request is for not yet minted token
-            assert_eq!(sh34.token_uri(42), Err(TokenNotExists));
+            // assert_eq!(sh34.token_uri(42), PreludeString::from(""));
 
             // verify token_uri when baseUri is empty
             set_sender(accounts.alice);
             assert!(sh34.set_base_uri(PreludeString::from("")).is_ok());
             assert_eq!(
                 sh34.token_uri(1),
-                Ok("".to_owned())
+                "".to_owned()
             );
 
             assert!(sh34.mint_with_metadatauri(PreludeString::from("uri")).is_ok());
-            assert_eq!(sh34.token_uri(2), Ok("".to_owned()+&PreludeString::from("uri")));
+            assert_eq!(sh34.token_uri(2), "".to_owned()+&PreludeString::from("uri"));
         }
 
         #[ink::test]
